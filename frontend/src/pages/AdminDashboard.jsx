@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Menu, LogOut, Edit2, Trash2, UserPlus } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
+import Navbar from '../components/Navbar';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -62,12 +63,8 @@ const AdminDashboard = () => {
     return (
         <div className="admin-dashboard">
             {/* Navigation */}
-            <nav className="admin-navbar">
-                <div className="admin-brand" ><Link to="/">Srinidhi Hostels</Link></div>
-                <button className="admin-menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                    <Menu size={24} />
-                </button>
-            </nav>
+            <br />
+             <Navbar />
 
             {/* Header */}
             <header className="dashboard-header container">

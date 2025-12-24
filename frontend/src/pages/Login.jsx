@@ -12,10 +12,12 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
         setError('');
+        setSuccess('');
     };
 
     const handleSubmit = async (e) => {
@@ -28,7 +30,10 @@ const Login = () => {
             // Basic validation simulation
             if (formData.email && formData.password) {
                 // Here we would check credentials and get role
-                // For demo, let's just navigate to home
+                setSuccess('✓ Login successful! Redirecting...');
+                setTimeout(() => {
+                    navigate('/');
+                }, 1500 );
                 navigate('/');
             } else {
                 setError('Invalid email or password');
@@ -83,6 +88,7 @@ const Login = () => {
                                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
                         </div>
+                    {success && <div className="success-message">{success}</div>}
                     </div>
 
                     {error && <div className="error-message">{error}</div>}

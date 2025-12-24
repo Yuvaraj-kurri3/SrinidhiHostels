@@ -2,21 +2,24 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import './Login.css'; // Reuse styles
+import axios from 'axios';
 
 const Register = () => {
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        role: 'student', // Default role
-        secretCode: ''
-    });
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        StudentRoomNumber:'',
+        StudentName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        Role: 'student', // Default role
+        secretCode: ''
+    });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -44,18 +47,39 @@ const Register = () => {
             return;
         }
 
-        if (formData.role === 'management' && !formData.secretCode) {
+        if (formData.Role === 'management' && !formData.secretCode) {
             setError('Hostel Secret Code is required for Management');
+            return;
+        }
+           if (formData.Role === 'management' && formData.secretCode!=='HOSTEL2024') {
+            setError('Hostel Secret Code is Incorrect!');
             return;
         }
 
         setIsLoading(true);
 
         // Simulate API call
-        setTimeout(() => {
+        setTimeout( async () => {
             setIsLoading(false);
-            // Success
-            navigate('/login');
+            try {
+                    await axios.post('http://localhost:5000/api/students/studentregistration', {
+                        StudentRoomNumber: formData.StudentRoomNumber, // Placeholder, adjust as needed
+                        StudentName: formData.StudentName,
+                        email: formData.email,
+                        Role: formData.Role,
+                        password: formData.password
+                    });
+
+                
+
+           } catch (error) {
+            setError('Registration failed. Please try again.');
+            return;
+           }
+               setSuccess('✓ Registration successful! Redirecting to login...');
+                        setTimeout(()=>{
+                            navigate('/login');
+                        },1500);
         }, 1500);
     };
 
@@ -71,14 +95,28 @@ const Register = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="auth-form">
+                       <div className="form-group">
+                        <label htmlFor="name">Enter Room Number</label>
+                        <input
+                            type="text"
+                            id="StudentRoomNumber"
+                            name="StudentRoomNumber"
+                            placeholder="Enter your room number"
+                            value={formData.StudentRoomNumber}
+                            onChange={handleChange}
+                            required
+                            autoFocus
+                            className="form-input"
+                        />
+                    </div>
                     <div className="form-group">
                         <label htmlFor="name">Full Name</label>
                         <input
                             type="text"
-                            id="name"
-                            name="name"
+                            id="StudentName"
+                            name="StudentName"
                             placeholder="Enter your full name"
-                            value={formData.name}
+                            value={formData.StudentName}
                             onChange={handleChange}
                             required
                             autoFocus
@@ -106,9 +144,9 @@ const Register = () => {
                             <label className="radio-label">
                                 <input
                                     type="radio"
-                                    name="role"
+                                    name="Role"
                                     value="student"
-                                    checked={formData.role === 'student'}
+                                    checked={formData.Role === 'student'}
                                     onChange={handleChange}
                                 />
                                 Student
@@ -116,9 +154,9 @@ const Register = () => {
                             <label className="radio-label">
                                 <input
                                     type="radio"
-                                    name="role"
+                                    name="Role"
                                     value="management"
-                                    checked={formData.role === 'management'}
+                                    checked={formData.Role === 'management'}
                                     onChange={handleChange}
                                 />
                                 Management
@@ -126,7 +164,7 @@ const Register = () => {
                         </div>
                     </div>
 
-                    {formData.role === 'management' && (
+                    {formData.Role === 'management' && (
                         <div className="form-group">
                             <label htmlFor="secretCode">Hostel Secret Code</label>
                             <input
@@ -186,6 +224,7 @@ const Register = () => {
                                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
                         </div>
+                    {success && <div className="success-message">{success}</div>}
                     </div>
 
                     {error && <div className="error-message">{error}</div>}

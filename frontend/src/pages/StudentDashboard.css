@@ -1,0 +1,73 @@
+/* Student Dashboard - page-specific styles to complement Tailwind utilities */
+:root{
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --accent: #4f46e5;
+  --muted: #64748b;
+  --dark: #0f172a;
+}
+
+.student-dashboard{
+  min-height:100vh;
+  background:var(--bg);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color:var(--dark);
+}
+
+.sd-navbar{
+  background:var(--card);
+  border-bottom:1px solid rgba(15,23,42,0.06);
+  padding:1rem 1.25rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  box-shadow:0 6px 18px rgba(15,23,42,0.03);
+}
+.sd-navbar .brand{font-weight:800;letter-spacing:-0.02em}
+
+.sd-header{
+  background:var(--card);
+  padding:2rem;
+  border-radius:6px;
+  box-shadow:0 10px 20px rgba(79,70,229,0.06);
+  display:flex;
+  gap:1.5rem;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.sd-hero{
+  flex:1 1 420px;
+}
+.sd-hero h1{font-size:clamp(1.75rem,3.2vw,2.75rem);margin:0 0 .5rem}
+.sd-hero p{color:var(--muted);font-weight:600}
+
+.sd-stats{display:flex;gap:1rem;align-items:stretch}
+.sd-card{background:var(--card);border-radius:6px;padding:1rem 1.25rem;border:1px solid rgba(15,23,42,0.06);min-width:140px;text-align:center}
+.sd-card .label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.sd-card .value{font-weight:800;font-size:1.5rem;margin-top:.35rem}
+
+.sd-section{margin-top:1.5rem}
+.sd-section h2{display:flex;align-items:center;gap:.75rem;font-weight:800;letter-spacing:.08em}
+.sd-table{background:var(--card);border-radius:6px;overflow:hidden;border:1px solid rgba(15,23,42,0.06)}
+.sd-table table{width:100%;border-collapse:collapse}
+.sd-table td{padding:1rem 1.25rem;border-bottom:1px solid rgba(15,23,42,0.03)}
+.sd-table .key{width:30%;font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.sd-table .val{font-weight:700;color:var(--dark);text-transform:none}
+
+.sd-quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.action-card{position:relative;background:var(--card);border-radius:6px;padding:1rem;border:1px solid rgba(15,23,42,0.06);overflow:hidden;display:flex;flex-direction:column;gap:.75rem;min-height:140px}
+.action-card .icon{width:48px;height:48px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center}
+.action-card h4{margin:0;font-weight:800}
+.action-card p{margin:0;color:var(--muted);font-weight:600}
+.action-card::after{content:'';position:absolute;inset:8px;border-radius:6px;transform:translate(6px,6px);background:rgba(15,23,42,0.03);z-index:-1}
+
+.sd-contact{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+.contact-card{background:var(--card);padding:1rem;border:1px solid rgba(15,23,42,0.06);border-radius:6px}
+
+@media (max-width:768px){
+  .sd-header{padding:1rem}
+  .sd-contact{grid-template-columns:1fr}
+}
+
+/* Small utility tweaks to reduce heavy borders from inline classes */
+.reduce-heavy-border{border-width:1px !important}
