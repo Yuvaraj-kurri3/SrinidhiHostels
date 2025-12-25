@@ -47,11 +47,11 @@ const Register = () => {
             return;
         }
 
-        if (formData.Role === 'management' && !formData.secretCode) {
+        if (formData.Role === 'admin' && !formData.secretCode) {
             setError('Hostel Secret Code is required for Management');
             return;
         }
-           if (formData.Role === 'management' && formData.secretCode!=='HOSTEL2024') {
+           if (formData.Role === 'admin' && formData.secretCode!=='HOSTEL2024') {
             setError('Hostel Secret Code is Incorrect!');
             return;
         }
@@ -62,7 +62,10 @@ const Register = () => {
         setTimeout( async () => {
             setIsLoading(false);
             try {
-                    await axios.post('http://localhost:5000/api/students/studentregistration', {
+                if(formData.Role==='student'){
+
+
+                  await axios.post('http://localhost:5000/api/students/studentregistration', {
                         StudentRoomNumber: formData.StudentRoomNumber, // Placeholder, adjust as needed
                         StudentName: formData.StudentName,
                         email: formData.email,
@@ -70,10 +73,25 @@ const Register = () => {
                         password: formData.password
                     });
 
-                
+                 }else{
 
+                      await axios.post('http://localhost:5000/api/students/studentregistration', {
+                         StudentRoomNumber: '001', // Management doesn't need room number
+                        StudentName: formData.StudentName,
+                        email: formData.email,
+                        Role: formData.Role,
+                        password: formData.password
+                    });
+                 }
            } catch (error) {
-            setError('Registration failed. Please try again.');
+            // Check if student already exists
+            if (error.response && error.response.status === 400 && error.response.data.message === 'Student already exists') {
+                setError('✗ This email is already registered. Please login or use a different email.');
+            } else if (error.response && error.response.data && error.response.data.message) {
+                setError(error.response.data.message);
+            } else {
+                setError('Registration failed. Please try again.');
+            }
             return;
            }
                setSuccess('✓ Registration successful! Redirecting to login...');
@@ -95,20 +113,7 @@ const Register = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="auth-form">
-                       <div className="form-group">
-                        <label htmlFor="name">Enter Room Number</label>
-                        <input
-                            type="text"
-                            id="StudentRoomNumber"
-                            name="StudentRoomNumber"
-                            placeholder="Enter your room number"
-                            value={formData.StudentRoomNumber}
-                            onChange={handleChange}
-                            required
-                            autoFocus
-                            className="form-input"
-                        />
-                    </div>
+                     
                     <div className="form-group">
                         <label htmlFor="name">Full Name</label>
                         <input
@@ -136,6 +141,7 @@ const Register = () => {
                             required
                             className="form-input"
                         />
+                        <p className='text-sm'>You will recieve OTP's in the time changing your password</p>
                     </div>
 
                     <div className="form-group">
@@ -155,8 +161,8 @@ const Register = () => {
                                 <input
                                     type="radio"
                                     name="Role"
-                                    value="management"
-                                    checked={formData.Role === 'management'}
+                                    value="admin"
+                                    checked={formData.Role === 'admin'}
                                     onChange={handleChange}
                                 />
                                 Management
@@ -164,7 +170,7 @@ const Register = () => {
                         </div>
                     </div>
 
-                    {formData.Role === 'management' && (
+                    {formData.Role === 'admin' && (
                         <div className="form-group">
                             <label htmlFor="secretCode">Hostel Secret Code</label>
                             <input
@@ -179,6 +185,26 @@ const Register = () => {
                             />
                         </div>
                     )}
+
+                    {
+                        formData.Role === 'student' &&(
+                                <div className="form-group">
+                        <label htmlFor="name">Enter Room Number</label>
+                        <input
+                            type="text"
+                            id="StudentRoomNumber"
+                            name="StudentRoomNumber"
+                            placeholder="Enter your room number"
+                            value={formData.StudentRoomNumber}
+                            onChange={handleChange}
+                            required
+                            autoFocus
+                            className="form-input"
+                        />
+                    </div>
+                        )
+                      
+                    }
 
                     <div className="form-group">
                         <label htmlFor="password">Create Password</label>

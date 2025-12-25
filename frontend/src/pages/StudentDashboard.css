@@ -24,6 +24,10 @@
   box-shadow:0 6px 18px rgba(15,23,42,0.03);
 }
 .sd-navbar .brand{font-weight:800;letter-spacing:-0.02em}
+.main-cont{
+  margin-top: 4.7rem;
+  width: 100%;
+}
 
 .sd-header{
   background:var(--card);
@@ -31,7 +35,7 @@
   border-radius:6px;
   box-shadow:0 10px 20px rgba(79,70,229,0.06);
   display:flex;
-  gap:1.5rem;
+   gap:1.5rem;
   align-items:center;
   flex-wrap:wrap;
 }
@@ -71,3 +75,22 @@
 
 /* Small utility tweaks to reduce heavy borders from inline classes */
 .reduce-heavy-border{border-width:1px !important}
+
+.sd-header-img {
+  max-height: 180px;
+  width: auto;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+  object-fit: cover;
+}
+
+.sd-header-img:hover {
+  transform: scale(1.02);
+}
+
+@media (max-width: 1024px) {
+  .sd-header-img {
+    display: none;
+  }
+}

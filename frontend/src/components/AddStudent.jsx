@@ -1,25 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight, Check, AlertCircle } from 'lucide-react';
 import './AddStudent.css';
-
-const initial = {
-  studentName: '',
-  roomNumber: '',
-  sharing: '1-sharing',
-  secondaryName: '',
-  collegeName: '',
-  courseYear: '',
-  mobile: ''
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+ const initial = {
+  StudentName: '',
+  RoomNumber: '',
+  Sharing: '1-sharing',
+  CollegeName: '',
+  CourseNameandYear: '',
+  Mobilenumber: '',
+  Email: '',
+  Address: '',
+  AmountPerMonth: '',
+  StartingDate: '',
+  PMobilenumber:''
 };
 
-export default function AddStudent({ onAdd }) {
+export default function AddStudent() {
+  const navigate = useNavigate();
   const [form, setForm] = useState(initial);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [user,setUser]=useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((s) => ({ ...s, [name]: value }));
+    setForm((s) => {
+      const updated = { ...s, [name]: value };
+      
+      // Auto-calculate AmountPerMonth based on Sharing type
+      if (name === 'Sharing') {
+        const amounts = {
+          '1': '7000',
+          '2': '8000',
+          '3': '6700',
+          '4': '6500',
+          '5': '6000'
+        };
+        updated.AmountPerMonth = amounts[value] || '6000';
+      }
+      
+      return updated;
+    });
   };
 
   const handleSubmit = (e) => {
@@ -27,21 +50,40 @@ export default function AddStudent({ onAdd }) {
     setSubmitting(true);
     setMessage({ type: '', text: '' });
     
-    // Validate required fields
-    if (!form.studentName || !form.roomNumber || !form.mobile) {
-      setMessage({ type: 'error', text: 'Please fill in all required fields.' });
-      setSubmitting(false);
-      return;
-    }
-
     // simple mock delay to simulate submit
-    setTimeout(() => {
+    setTimeout(async () => {
       setSubmitting(false);
-      if (onAdd) onAdd(form);
-      setMessage({ type: 'success', text: 'Student added successfully!' });
-      setForm(initial);
+      try {
+        await axios.post('http://localhost:5000/api/students/addnewstudent', {
+          RoomNumber: form.RoomNumber,
+          Sharing: form.Sharing,
+          StartingDate: form.StartingDate,
+          AmountPerMonth: form.AmountPerMonth,
+          StudentName: form.StudentName,
+          Mobilenumber: form.Mobilenumber,
+          PMobilenumber: form.PMobilenumber,
+          Email: form.Email,
+          Address: form.Address,
+          CollegeName: form.CollegeName,
+          CourseNameandYear: form.CourseNameandYear
+        }).then((res) => {
+          console.log(res.data);
+        });
+
+        setMessage({ type: 'success', text: 'New student added successfully!' });
+        // Clear success message after 3 seconds
+        setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+        setForm(initial);
+        navigate('/student-dashboard');
+      } catch (error) {
+        setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to add student. Please try again.' });
+        // Clear error message after 3 seconds
+        setTimeout(() => setMessage({ type: '', text: '' }), 2000);
+        return;
+      }
       // Clear success message after 3 seconds
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+      setForm(initial);
     }, 600);
   };
 
@@ -63,8 +105,8 @@ export default function AddStudent({ onAdd }) {
           <span className="form-label">Student Name *</span>
           <input 
             type="text"
-            name="studentName" 
-            value={form.studentName} 
+            name="StudentName" 
+            value={form.StudentName} 
             onChange={handleChange}
             className="form-input"
             placeholder="Full name" 
@@ -76,8 +118,8 @@ export default function AddStudent({ onAdd }) {
           <span className="form-label">Room Number *</span>
           <input 
             type="text"
-            name="roomNumber" 
-            value={form.roomNumber} 
+            name="RoomNumber" 
+            value={form.RoomNumber} 
             onChange={handleChange}
             className="form-input"
             placeholder="e.g. B-204" 
@@ -88,25 +130,25 @@ export default function AddStudent({ onAdd }) {
         <label className="form-group">
           <span className="form-label">Type of Sharing</span>
           <select 
-            name="sharing" 
-            value={form.sharing} 
+            name="Sharing" 
+            value={form.Sharing} 
             onChange={handleChange}
             className="form-select"
           >
-            <option>1-sharing</option>
-            <option>2-sharing</option>
-            <option>3-sharing</option>
-            <option>4-sharing</option>
-            <option>5-sharing</option>
+            <option value={'1'} >1-sharing</option>
+            <option value={'2'}>2-sharing</option>
+            <option value={'3'}>3-sharing</option>
+            <option value={'4'}>4-sharing</option>
+            <option value={'5'}>5-sharing</option>
           </select>
         </label>
 
         <label className="form-group">
-          <span className="form-label">Secondary Name</span>
+          <span className="form-label">Joining Date</span>
           <input 
-            type="text"
-            name="secondaryName" 
-            value={form.secondaryName} 
+            type="date"
+            name="StartingDate" 
+            value={form.StartingDate} 
             onChange={handleChange}
             className="form-input"
             placeholder="Optional second contact" 
@@ -117,8 +159,8 @@ export default function AddStudent({ onAdd }) {
           <span className="form-label">College Name</span>
           <input 
             type="text"
-            name="collegeName" 
-            value={form.collegeName} 
+            name="CollegeName" 
+            value={form.CollegeName} 
             onChange={handleChange}
             className="form-input"
             placeholder="College / Institute" 
@@ -129,24 +171,73 @@ export default function AddStudent({ onAdd }) {
           <span className="form-label">Course & Year</span>
           <input 
             type="text"
-            name="courseYear" 
-            value={form.courseYear} 
+            name="CourseNameandYear" 
+            value={form.CourseNameandYear} 
             onChange={handleChange}
             className="form-input"
             placeholder="e.g. B.Tech CS - 3rd Year" 
           />
         </label>
 
-        <label className="form-group full-width">
-          <span className="form-label">Mobile Number *</span>
+        <label className="form-group">
+          <span className="form-label">Student Mobile Number *</span>
           <input 
             type="tel"
-            name="mobile" 
-            value={form.mobile} 
+            name="Mobilenumber" 
+            value={form.Mobilenumber} 
             onChange={handleChange}
             className="form-input"
             placeholder="+91 98765 43210" 
             required 
+          />
+        </label>
+
+         <label className="form-group">
+          <span className="form-label">Parents Mobile Number *</span>
+          <input 
+            type="tel"
+            name="PMobilenumber" 
+            value={form.PMobilenumber} 
+            onChange={handleChange}
+            className="form-input"
+            placeholder="+91 98765 43210" 
+            required 
+          />
+        </label>
+          <label className="form-group">
+          <span className="form-label">Email*</span>
+          <input 
+            type="email"
+            name="Email" 
+            value={form.Email} 
+            onChange={handleChange}
+            className="form-input"
+            placeholder="student@gmail.com" 
+            required 
+          />
+        </label>
+          <label className="form-group">
+          <span className="form-label">Address*</span>
+          <input 
+            type="textarea"
+            name="Address" 
+            value={form.Address} 
+            onChange={handleChange}
+            className="form-input"
+            placeholder="ex: 123 Main St, City, State" 
+            required 
+          />
+        </label>
+               <label className="form-group">
+          <span className="form-label">Amount Per Month*</span>
+          <input 
+            type="text"
+            name="AmountPerMonth" 
+            value={form.AmountPerMonth} 
+            onChange={handleChange}
+            className="form-input"
+            placeholder="ex:7000" 
+            readOnly
           />
         </label>
       </div>

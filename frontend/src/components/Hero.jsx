@@ -16,8 +16,8 @@ const Hero = () => {
                         Manage rooms, fees, and students effortlessly.
                     </p>
                     <div className="hero-buttons">
-                        <Link to="/register"><button className="btn-hero-primary">
-                            Get Started <ArrowRight size={20} />
+                        <Link to="/student-dashboard"><button className="btn-hero-primary">
+                            Student <ArrowRight size={20} />
                         </button></Link>
                         <Link to="/admin-dashboard"><button className="btn-hero-secondary">Admin</button></Link>
                     </div>

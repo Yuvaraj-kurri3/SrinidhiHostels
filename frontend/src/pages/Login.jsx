@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import './Login.css';
+import axios from 'axios';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -25,19 +26,48 @@ const Login = () => {
         setIsLoading(true);
 
         // Simulate API call
-        setTimeout(() => {
+        setTimeout(async () => {
             setIsLoading(false);
-            // Basic validation simulation
-            if (formData.email && formData.password) {
-                // Here we would check credentials and get role
+            // Here we would check credentials and get rol
+            try {
+
+                const Userdata = await axios.post('http://localhost:5000/api/students/studentlogin', formData);
+                console.log('Userdata', Userdata);
                 setSuccess('✓ Login successful! Redirecting...');
+
                 setTimeout(() => {
-                    navigate('/');
-                }, 1500 );
-                navigate('/');
-            } else {
-                setError('Invalid email or password');
+                    setSuccess('');
+                    const userData = {
+                        id: Userdata?.data?.data?._id,
+                        name: Userdata?.data?.data?.StudentName,
+                        email: Userdata?.data?.data?.email,
+                        role: Userdata?.data?.data?.Role
+                    };
+                    sessionStorage.setItem('user', JSON.stringify(userData));
+
+                    if (Userdata?.data?.data?.Role === 'admin') {
+                        localStorage.setItem('adminToken', Userdata?.data?.token);
+                        navigate('/admin-dashboard');
+                        return;
+                    }
+                    else {
+                        localStorage.setItem('studentToken', Userdata?.data?.token);
+                        navigate('/student-dashboard');
+                        return;
+                    }
+                }, 2000);
             }
+            catch (error) {
+                if (error.response && error.response.status === 400 && error.response.data.message === 'Invalid credentials') {
+                    setError('Invalid credentials.');
+                } else if (error.response && error.response.data && error.response.data.message === 'Student not found! Please register') {
+                    setError(error.response.data.message);
+                } else {
+                    setError('Registration failed. Please try again.');
+                }
+                return;
+            }
+
         }, 1500);
     };
 
@@ -88,7 +118,7 @@ const Login = () => {
                                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
                         </div>
-                    {success && <div className="success-message">{success}</div>}
+                        {success && <div className="success-message">{success}</div>}
                     </div>
 
                     {error && <div className="error-message">{error}</div>}

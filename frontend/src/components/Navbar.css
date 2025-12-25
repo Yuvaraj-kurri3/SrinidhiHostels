@@ -31,8 +31,11 @@
 
 .desktop-actions,
 .desktop-links {
-    display: none;
-}
+        display: none;
+ }
+ .logout{
+    margin-left:10px;
+ }
 
 .mobile-menu-toggle {
     background: none;
@@ -50,6 +53,20 @@
 }
 
 .btn-login:hover {
+    transform: scale(1.05);
+}
+
+.btn-logout {
+    background: #ef4444;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    transition: transform 0.2s;
+    margin-left: 5px;
+}
+
+.btn-logout:hover {
     transform: scale(1.05);
 }
 
@@ -74,7 +91,7 @@
     display: flex;
     flex-direction: column;
     padding: 1rem;
-    gap: 1rem;
+   
 }
 
 .mobile-menu-links a {
@@ -86,6 +103,11 @@
 .btn-login.mobile {
     width: 100%;
     margin-top: 0.5rem;
+}
+
+.btn-logout.mobile {
+    width: 100%;
+    margin-top: 1rem;
 }
 
 @media (min-width: 768px) {
