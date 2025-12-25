@@ -76,10 +76,10 @@ const AdminDashboard = () => {
         e.preventDefault();
         setUpdateLoading(true);
         try {
-            await axios.put(`${Api}api/students/updatestudent/${currentStudent._id}`, currentStudent);
+            await axios.put(`${Api}api/students/updatestudent/${currentStudent._id}`, currentStudent,{ withCredentials: true });
             setEditModalOpen(false);
             // Refresh student list
-            const response = await axios.get(`${Api}api/students/allstudents`);
+            const response = await axios.get(`${Api}api/students/allstudents`,{ withCredentials: true });
             if (response.status === 200) {
                 setStudents(response.data.data);
             }

@@ -71,7 +71,7 @@ const Register = () => {
                         email: formData.email,
                         Role: formData.Role,
                         password: formData.password
-                    });
+                    },{ withCredentials: true });
 
                  }else{
 
@@ -81,7 +81,7 @@ const Register = () => {
                         email: formData.email,
                         Role: formData.Role,
                         password: formData.password
-                    });
+                    },{ withCredentials: true });
                  }
            } catch (error) {
             // Check if student already exists

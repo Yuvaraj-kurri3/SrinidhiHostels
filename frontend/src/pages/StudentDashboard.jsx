@@ -57,10 +57,10 @@ const StudentDashboard = () => {
             try {
                 const email = user?.email;
                 if (email) {
-                    const response = await axios.get(`${Api}api/students/getstudentbymail/${email}`);
+                    const response = await axios.get(`${Api}api/students/getstudentbymail/${email}`,{ withCredentials: true });
                     console.log('Student details response:', response);
                     if (response.status === 200 && response.data.data===null) {
-                        alert("please add your data");
+                        alert("Please Add Your Details..");
                     }
                     else{
                         const data = response.data.data;

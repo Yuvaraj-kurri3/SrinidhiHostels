@@ -67,7 +67,7 @@ export default function AddStudent() {
           Address: form.Address,
           CollegeName: form.CollegeName,
           CourseNameandYear: form.CourseNameandYear
-        }).then((res) => {
+        },{ withCredentials: true }).then((res) => {
           console.log(res.data);
         });
 
