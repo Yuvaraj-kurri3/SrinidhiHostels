@@ -44,6 +44,14 @@ const allstudents=new mongoose.Schema({
     CourseNameandYear:{
         type:String,
         required:true,
+    },
+    paymentstatus:{
+        type:String,
+        required:true,
+    },
+    isActive:{
+        type:Boolean,
+        default:true
     }
     
 })

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, use } from 'react';
-import { Menu, LogOut, Edit2, Trash2, UserPlus } from 'lucide-react';
+import { Menu, LogOut, Edit2, Trash2, UserPlus, Search } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './AdminDashboard.css';
 import Navbar from '../components/Navbar';
 import AddStudent from '../components/AddStudent';
+import api from '../api.js';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -15,14 +16,16 @@ const AdminDashboard = () => {
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [currentStudent, setCurrentStudent] = useState(null);
     const [updateLoading, setUpdateLoading] = useState(false);
-    const Api="https://srinidhihostelsbackend.onrender.com/";
+    const [searchresult, setSearchresult] = useState(false);
+    const [SearchQuery, setSearchQuery] = useState('');
+    const [unpaidlist, setUnpaidlist] = useState([]);
+    const Api = api;
 
     useEffect(() => {
         // Fetch students from backend
         const fetchStudents = async () => {
             try {
-                const response = await axios.get(`${Api}api/students/allstudents`);
-                console.log(response);
+                const response = await axios.get(`${Api}/api/students/allstudents`);
                 if (response.status == 200) {
                     setStudents(response.data.data);
                 }
@@ -32,6 +35,26 @@ const AdminDashboard = () => {
         };
         fetchStudents();
     }, []);
+    const Getbyroom = async (e) => {
+        const roomnumber = SearchQuery;
+        if (roomnumber) {
+            try {
+                const res = await axios.get(`${Api}/api/students/getbyroomnumber/${roomnumber}`);
+                if (res.status == 200) {
+                    setStudents(res.data.data);
+                    setSearchresult(true);
+                    setTimeout(() => setSearchresult(false), 2000);
+                }
+
+            } catch (error) {
+                if (error.response && error.response.status === 404 && error.response.data.message === 'Room not found') {
+                    setError('Room not found');
+                    setTimeout(() => setError(''), 2000);
+                }
+            }
+        }
+
+    }
 
     useEffect(() => {
         const checkLogin = () => {
@@ -56,7 +79,7 @@ const AdminDashboard = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this student?')) {
             try {
-                await axios.delete(`${Api}api/students/deletestudent/${id}`);
+                await axios.delete(`${Api}/api/students/deletestudent/${id}`);
                 setDeleted(true);
                 setTimeout(() => setDeleted(false), 3000);
                 //refresh the after deletion
@@ -76,10 +99,10 @@ const AdminDashboard = () => {
         e.preventDefault();
         setUpdateLoading(true);
         try {
-            await axios.put(`${Api}api/students/updatestudent/${currentStudent._id}`, currentStudent,{ withCredentials: true });
+            await axios.put(`${Api}/api/students/updatestudent/${currentStudent._id}`, currentStudent, { withCredentials: true });
             setEditModalOpen(false);
             // Refresh student list
-            const response = await axios.get(`${Api}api/students/allstudents`,{ withCredentials: true });
+            const response = await axios.get(`${Api}/api/students/allstudents`, { withCredentials: true });
             if (response.status === 200) {
                 setStudents(response.data.data);
             }
@@ -91,13 +114,58 @@ const AdminDashboard = () => {
             setUpdateLoading(false);
         }
     };
+    useEffect(() => {
+        const fetchunpaidlist = async () => {
 
-    const handleLogout = () => {
-        navigate('/login');
+            try {
+                const response = await axios.get(`${Api}/api/students/unpaidlist`);
+                if (response.status == 200) {
+                    setUnpaidlist(response.data.data);
+
+                }
+            } catch (error) {
+                alert('Failed to fetch unpaid list.');
+                return;
+            }
+        }
+
+        // Call the function to fetch unpaid list
+        fetchunpaidlist();
+    }, []);
+
+    const updatepaymentstatus = (id) => async () => {
+
+        try {
+            await axios.put(`${Api}/api/students/updatepaymentstatus/${id}`, { withCredentials: true });
+            // Refresh unpaid list
+            const response = await axios.get(`${Api}/api/students/unpaidlist`, { withCredentials: true });
+            if (response.status === 200) {
+                setUnpaidlist(response.data.data);
+            }
+            alert('Payment status updated to Paid!');
+
+            window.location.reload();
+        } catch (error) {
+            console.error('Error updating payment status:', error);
+            alert('Failed to update payment status.');
+        }
+
+    }
+
+    const updateallpaymentstatus = async () => {
+
+        try {
+            await axios.put(`${Api}/api/students/updateallpaymentstatus`, { withCredentials: true });
+            alert('All payment statuses updated to Unpaid!');
+            window.location.reload();
+        } catch (error) {
+            console.log('Error in updating all payment status:',error);
+        }
     };
 
     return (
         <div className="admin-dashboard">
+            <title>Admin Dashboard - Srinidhi Hostels</title>
             {/* Navigation */}
             <br />
             <Navbar />
@@ -113,9 +181,12 @@ const AdminDashboard = () => {
                         <span className="stat-value">{students.length}</span>
                         <span className="stat-label">Total Students</span>
                     </div>
-                    <div className="stat-card">
-                        <span className="stat-value">12</span>
-                        <span className="stat-label">Rooms Occupied</span>
+                    <div className="stat-card-with-button">
+                        <div className="stat-card">
+                            <span className="stat-value">12</span>
+                            <span className="stat-label">Rooms Occupied</span>
+                        </div>
+                        <button className="update-payment-btn" onClick={updateallpaymentstatus}>Update Payment Status</button>
                     </div>
                 </div>
             </header>
@@ -130,26 +201,32 @@ const AdminDashboard = () => {
                     <table className="data-table unpaid-table">
                         <thead>
                             <tr>
+                                <th>S.No</th>
                                 <th>Student Name</th>
                                 <th>Room No</th>
                                 <th>Amount Due</th>
                                 <th>Contact</th>
+                                <th>Ispaid?</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>Anil</td>
-                                <td>203</td>
-                                <td>₹6000</td>
-                                <td>98XXXXXX12</td>
-                            </tr>
-                            <tr>
-                                <td>Kiran</td>
-                                <td>105</td>
-                                <td>₹4500</td>
-                                <td>91XXXXXX34</td>
-                            </tr>
-                        </tbody>
+                         {unpaidlist.length > 0 ?
+                            unpaidlist.map((student, index) => (
+                                <tbody key={student._id}>
+                                    <tr>
+                                        <td>{index + 1}</td>
+                                        <td>{student.StudentName}</td>
+                                        <td>{student.RoomNumber}</td>
+                                        <td>₹{student.AmountPerMonth}</td>
+                                        <td>{student.Mobilenumber}</td>
+                                        <td> <button onClick={updatepaymentstatus(student._id)} className='btn-hero-secondary'>Ispaid?</button></td>
+                                    </tr>
+                                </tbody>
+                            )) :
+                            <tbody>
+                                <tr>
+                                    <td colSpan="6" style={{ textAlign: 'center' }}>No unpaid students for this month.</td>
+                                </tr>
+                            </tbody>}
                     </table>
                 </div>
             </section>
@@ -157,13 +234,61 @@ const AdminDashboard = () => {
             {/* Student Details Table */}
             <section className="dashboard-section container">
                 <h2 className="section-header">Student Details</h2>
-                {deleted && <p style={{ color: 'green', marginBottom: '1rem' }}>✓ Student deleted successfully!</p>}
-                {error && <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
-                        {/* <div>
-                            <input type="text" placeholder="Search" />
-                            <button>Search</button>
-
-                        </div> */}
+                {searchresult && (
+                    <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4 rounded shadow-sm">
+                        <p className="text-green-700 font-medium flex items-center gap-2">
+                            <span>✓</span> Room found!
+                        </p>
+                    </div>
+                )}
+                {deleted && (
+                    <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4 rounded shadow-sm">
+                        <p className="text-green-700 font-medium flex items-center gap-2">
+                            <span>✓</span> Student deleted successfully!
+                        </p>
+                    </div>
+                )}
+                {error && (
+                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4 rounded shadow-sm">
+                        <p className="text-red-700 font-medium flex items-center gap-2">
+                            <span>⚠</span> {error}
+                        </p>
+                    </div>
+                )}
+                <div className="search-container">
+                    <div className="search-wrapper">
+                        <div className="search-icon-wrapper">
+                            <Search size={20} />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Enter room number to search..."
+                            name="roomnumber"
+                            value={SearchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="search-input"
+                        />
+                        <button
+                            onClick={Getbyroom}
+                            className="search-button"
+                        >
+                            <Search size={18} />
+                            <span>Search</span>
+                        </button>
+                    </div>
+                    {SearchQuery && (
+                        <button
+                            onClick={() => {
+                                setSearchQuery('');
+                                window.location.reload();
+                            }}
+                            className="clear-search-btn"
+                        >
+                            ✕ <span>Clear Results</span>
+                        </button>
+                    )}
+                </div>
+                {/* Student Table */}
                 <div className="table-container">
                     <table className="data-table">
                         <thead>
@@ -182,7 +307,7 @@ const AdminDashboard = () => {
 
                         <tbody>
 
-                            {students.map((student, index) => (
+                            {students.length != 0 ? students.map((student, index) => (
                                 <tr key={student._id}>
                                     <td>{index + 1}</td>
                                     <td>{student.RoomNumber}</td>
@@ -197,7 +322,7 @@ const AdminDashboard = () => {
                                         <button className="action-btn delete" onClick={() => handleDelete(student._id)} title="Delete"><Trash2 size={18} /></button>
                                     </td>
                                 </tr>
-                            ))}
+                            )) : <tr><td colSpan="9" style={{ textAlign: 'center' }}>No students found.</td></tr>}
                         </tbody>
                     </table>
                 </div>
@@ -236,6 +361,7 @@ const AdminDashboard = () => {
                                         required
                                     />
                                 </div>
+
                                 <div className="form-group">
                                     <label>Sharing</label>
                                     <select
@@ -246,6 +372,7 @@ const AdminDashboard = () => {
                                         <option value="2">2-sharing</option>
                                         <option value="3">3-sharing</option>
                                         <option value="4">4-sharing</option>
+                                        <option value="5">5-sharing</option>
                                     </select>
                                 </div>
                                 <div className="form-group">

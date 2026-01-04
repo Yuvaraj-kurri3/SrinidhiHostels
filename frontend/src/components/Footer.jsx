@@ -3,7 +3,7 @@ import './Footer.css';
 
 const Footer = () => {
     return (
-        <footer className="footer">
+        <footer className="footer" id='contact'>
             <div className="container footer-content">
                 <div className="footer-brand">
                     <h2 className="footer-logo">Srinidhi Hostels</h2>

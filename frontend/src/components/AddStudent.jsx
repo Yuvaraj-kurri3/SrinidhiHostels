@@ -3,6 +3,7 @@ import { ArrowRight, Check, AlertCircle } from 'lucide-react';
 import './AddStudent.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import api from '../api.js'
  const initial = {
   StudentName: '',
   RoomNumber: '',
@@ -14,7 +15,8 @@ import { useNavigate } from 'react-router-dom';
   Address: '',
   AmountPerMonth: '',
   StartingDate: '',
-  PMobilenumber:''
+  PMobilenumber:'',
+  paymentstatus:'Unpaid'
 };
 
 export default function AddStudent() {
@@ -23,8 +25,9 @@ export default function AddStudent() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [user,setUser]=useState(null);
-  const Api="https://srinidhihostelsbackend.onrender.com/";
 
+ 
+ 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((s) => {
@@ -54,8 +57,23 @@ export default function AddStudent() {
     // simple mock delay to simulate submit
     setTimeout(async () => {
       setSubmitting(false);
+
+        const storedUser = sessionStorage.getItem('user');
+            if (!storedUser) {
+                alert("Please login to access your details");
+                navigate("/login");
+                return;
+            }
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+
+            if(parsedUser.email !== form.Email){
+              alert("Please use your logged-in email address to add student");
+              return;
+            }
+
       try {
-        await axios.post(`${Api}api/students/addnewstudent`, {
+        await axios.post(`${api}/api/students/addnewstudent`, {
           RoomNumber: form.RoomNumber,
           Sharing: form.Sharing,
           StartingDate: form.StartingDate,
@@ -63,20 +81,18 @@ export default function AddStudent() {
           StudentName: form.StudentName,
           Mobilenumber: form.Mobilenumber,
           PMobilenumber: form.PMobilenumber,
-          Email: form.Email,
+          Email:form.Email,
           Address: form.Address,
           CollegeName: form.CollegeName,
-          CourseNameandYear: form.CourseNameandYear
-        },{ withCredentials: true }).then((res) => {
-          console.log(res.data);
-        });
+          CourseNameandYear: form.CourseNameandYear,
+          paymentstatus:form.paymentstatus
+        },{ withCredentials: true });
 
         setMessage({ type: 'success', text: 'New student added successfully!' });
         // Clear success message after 3 seconds
         setTimeout(() => setMessage({ type: '', text: '' }), 3000);
         setForm(initial);
-        navigate('/student-dashboard');
-      } catch (error) {
+       } catch (error) {
         setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to add student. Please try again.' });
         // Clear error message after 3 seconds
         setTimeout(() => setMessage({ type: '', text: '' }), 2000);
@@ -215,8 +231,11 @@ export default function AddStudent() {
             className="form-input"
             placeholder="student@gmail.com" 
             required 
+         
           />
+             <small>Please use your logged-in email address</small>
         </label>
+     
           <label className="form-group">
           <span className="form-label">Address*</span>
           <input 
@@ -240,6 +259,18 @@ export default function AddStudent() {
             placeholder="ex:7000" 
             readOnly
           />
+        </label>
+         <label className="form-group">
+          <span className="form-label">Payment Status</span>
+          <select 
+            name="paymentstatus" 
+            value={form.paymentstatus} 
+            onChange={handleChange}
+            className="form-select"
+          >
+            <option value={"Paid"} >Paid</option>
+            <option value={"Unpaid"}>Unpaid</option>
+          </select>
         </label>
       </div>
 

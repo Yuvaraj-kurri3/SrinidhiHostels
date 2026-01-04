@@ -64,6 +64,9 @@
     transform: scale(0.98);
 }
 
+.btn-hero-primary:hover {
+ background: var(--gradient-secondary);
+}
 .btn-hero-secondary {
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);

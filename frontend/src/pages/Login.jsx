@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import './Login.css';
 import axios from 'axios';
-
+import api from '../api';
 const Login = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -14,6 +14,7 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,9 +32,8 @@ const Login = () => {
             // Here we would check credentials and get rol
             try {
 
-                const Userdata = await axios.post('https://srinidhihostelsbackend.onrender.com/api/students/studentlogin', formData,{ withCredentials: true });
-                console.log('Userdata', Userdata);
-                setSuccess('✓ Login successful! Redirecting...');
+                const Userdata = await axios.post(api + '/api/students/studentlogin', formData, { withCredentials: true });
+                 setSuccess('✓ Login successful! Redirecting...');
 
                 setTimeout(() => {
                     setSuccess('');

@@ -23,13 +23,16 @@ import './StudentDashboard.css';
 import Navbar from '../components/Navbar';
 import LocationMap from '../components/LocationMap';
 import AddStudent from '../components/AddStudent';
+import HowItWorks from '../components/HowItWorks';
+import Features from '../components/Features';
 import axios from 'axios';
+import api from '../api';
 
 const StudentDashboard = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
-    const Api="https://srinidhihostelsbackend.onrender.com/";
+    const Api=api;
 
     useEffect(() => {
         const checkLogin = () => {
@@ -57,9 +60,8 @@ const StudentDashboard = () => {
             try {
                 const email = user?.email;
                 if (email) {
-                    const response = await axios.get(`${Api}api/students/getstudentbymail/${email}`,{ withCredentials: true });
-                    console.log('Student details response:', response);
-                    if (response.status === 200 && response.data.data===null) {
+                    const response = await axios.get(`${Api}/api/students/getstudentbymail/${email}`,{ withCredentials: true });
+                      if (response.status === 200 && response.data.data===null) {
                         alert("Please Add Your Details..");
                     }
                     else{
@@ -150,7 +152,7 @@ const StudentDashboard = () => {
                     </div>
                 </header>
                 <AddStudent />
-                {/* DETAILS SECTION - Sharp Table with alternating colors */}
+                {/* gDETAILS SECTION - Sharp Table with alternating colors */}
                 <section className="sd-section">
                     <h2 className="text-2xl font-black text-slate-900 uppercase tracking-widest flex items-center gap-4">
                         <span className="bg-slate-900 text-white px-4 py-1">01</span>
@@ -166,7 +168,7 @@ const StudentDashboard = () => {
                                     { label: "Mobile Number", value: studentData.mobile },
                                     { label: "Hostel Name", value: studentData.hostelName },
                                     { label: "Join Date", value: studentData.joinDate.slice(0,10) },
-                                    { label: "Room Allotment", value: `${studentData.roomNo} (Bed A)` },
+                                    { label: "Room Allotment", value: `${studentData.roomNo} ` },
                                        { label: "Role", value: studentData.role}
                                 
                                 ].map((row, i) => (
@@ -210,8 +212,9 @@ const StudentDashboard = () => {
 
                 {/* CONTACT & SUPPORT - Sharp Blocks */}
 
-
             </main>
+                            <Features/>
+            <HowItWorks/>
 
             <LocationMap />
 

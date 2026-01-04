@@ -4,10 +4,10 @@ import './HowItWorks.css';
 const HowItWorks = () => {
     const steps = [
         { number: '01', title: 'Register', desc: 'Create your account and setup your room and hostel details.' },
-        { number: '02', title: 'Online Payment', desc: 'Pay your hostel fees online easily.' },
-        { number: '03', title: 'Check mess', desc: 'Check your mess food online easily.' },
-        { number: '04', title: 'Online Complaints', desc: 'Raise your complaints online easily.' },
-        { number: '05', title: 'Payment Recipt', desc: 'Get your payment recipt online easily.' },
+        { number: '02', title: 'Online Payment', desc: 'Pay your hostel fees online easily.', soon:"Coming Soon.." },
+        { number: '03', title: 'Check mess', desc: 'Check your mess food online easily.',soon:"Coming Soon.." },
+        { number: '04', title: 'Online Complaints', desc: 'Raise your complaints online easily.',soon:"Coming Soon.." },
+        { number: '05', title: 'Payment Recipt', desc: 'Get your payment recipt online easily.',soon:"Coming Soon.." },
     ];
 
     return (
@@ -24,6 +24,7 @@ const HowItWorks = () => {
                             <div className="step-number">{step.number}</div>
                             <h3 className="step-title">{step.title}</h3>
                             <p className="step-desc">{step.desc}</p>
+                              <p className="step-desc">{step.soon}</p>
                         </div>
                     ))}
                 </div>

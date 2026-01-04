@@ -5,7 +5,7 @@ import userRoutes from './routes/StudentRoutes.js';
 import cors from 'cors';
 import session from 'express-session';
 
-const app=express();
+const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
@@ -43,19 +43,19 @@ app.use(
 );
 
 
-const port= process.env.SRINIDHI_PORT || 5000;
+const port = process.env.SRINIDHI_PORT || 5000;
 connectDB();
 dotenv.config();
 
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use('/api/students',userRoutes);
-app.get('/',(req,res)=>{
-    res.send('Srinidhi Hostels Backend is running');
+app.use('/api/students', userRoutes);
+app.get('/', (req, res) => {
+  res.send('Srinidhi Hostels Backend is running');
 })
 
-app.listen(port, ()=>{
-    console.log(`Server is running on port http://localhost:${port}`);
+app.listen(port, () => {
+  console.log(`Server is running on port http://localhost:${port}`);
 })
