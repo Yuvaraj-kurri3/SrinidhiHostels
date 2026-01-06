@@ -19,6 +19,7 @@ const AdminDashboard = () => {
     const [searchresult, setSearchresult] = useState(false);
     const [SearchQuery, setSearchQuery] = useState('');
     const [unpaidlist, setUnpaidlist] = useState([]);
+    const [loading, setLoading] = useState(true);
     const Api = api;
 
     useEffect(() => {
@@ -26,8 +27,11 @@ const AdminDashboard = () => {
         const fetchStudents = async () => {
             try {
                 const response = await axios.get(`${Api}/api/students/allstudents`);
-                if (response.status == 200) {
+                if (response.status == 200 ) {
                     setStudents(response.data.data);
+                }
+                else{
+                    setStudents([]);
                 }
             } catch (error) {
                 console.error('Error fetching students:', error);
@@ -55,7 +59,7 @@ const AdminDashboard = () => {
         }
 
     }
-
+    //login 
     useEffect(() => {
         const checkLogin = () => {
             const storedUser = sessionStorage.getItem('user');
@@ -70,16 +74,18 @@ const AdminDashboard = () => {
                 navigate("/");
                 return;
             }
+            setLoading(false);
         };
 
         const timer = setTimeout(checkLogin, 800);
         return () => clearTimeout(timer);
     }, [navigate]);
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this student?')) {
+        //delete student
+    const handleDelete = async (student) => {
+        if (window.confirm(`Are you sure you want to delete student ${student.StudentName.toUpperCase()}?`)) {
             try {
-                await axios.delete(`${Api}/api/students/deletestudent/${id}`);
+                await axios.delete(`${Api}/api/students/deletestudent/${student._id}`, { withCredentials: true });
                 setDeleted(true);
                 setTimeout(() => setDeleted(false), 3000);
                 //refresh the after deletion
@@ -89,12 +95,12 @@ const AdminDashboard = () => {
             }
         }
     };
-
+        //edit student
     const handleEdit = (student) => {
         setCurrentStudent({ ...student });
         setEditModalOpen(true);
     };
-
+        //edit all student details
     const handleUpdate = async (e) => {
         e.preventDefault();
         setUpdateLoading(true);
@@ -109,22 +115,28 @@ const AdminDashboard = () => {
             alert('Student updated successfully!');
         } catch (error) {
             console.error('Error updating student:', error);
-            alert('Failed to update student.');
+            confirm('Failed to update student.');
         } finally {
             setUpdateLoading(false);
         }
     };
+    //unpaid list
     useEffect(() => {
         const fetchunpaidlist = async () => {
 
             try {
                 const response = await axios.get(`${Api}/api/students/unpaidlist`);
-                if (response.status == 200) {
-                    setUnpaidlist(response.data.data);
-
+                if (response.status != 200 ) {
+                    setUnpaidlist([]);
+                    return;
                 }
+                setUnpaidlist(response.data.data);
             } catch (error) {
-                alert('Failed to fetch unpaid list.');
+                if(error.response && error.response.status === 404){
+                    setUnpaidlist([]);
+                    return;
+                }
+                confirm('Failed to fetch unpaid list! please try again later.');
                 return;
             }
         }
@@ -133,21 +145,21 @@ const AdminDashboard = () => {
         fetchunpaidlist();
     }, []);
 
-    const updatepaymentstatus = (id) => async () => {
+    const updatepaymentstatus = (student) => async () => {
 
         try {
-            await axios.put(`${Api}/api/students/updatepaymentstatus/${id}`, { withCredentials: true });
+            await axios.put(`${Api}/api/students/updatepaymentstatus/${student._id}`, { withCredentials: true });
             // Refresh unpaid list
             const response = await axios.get(`${Api}/api/students/unpaidlist`, { withCredentials: true });
             if (response.status === 200) {
                 setUnpaidlist(response.data.data);
             }
-            alert('Payment status updated to Paid!');
+            confirm(`Payment status for ${student.StudentName} updated to Paid!`);
 
             window.location.reload();
         } catch (error) {
             console.error('Error updating payment status:', error);
-            alert('Failed to update payment status.');
+            confirm('Failed to update payment status.');
         }
 
     }
@@ -155,13 +167,24 @@ const AdminDashboard = () => {
     const updateallpaymentstatus = async () => {
 
         try {
-            await axios.put(`${Api}/api/students/updateallpaymentstatus`, { withCredentials: true });
-            alert('All payment statuses updated to Unpaid!');
-            window.location.reload();
+            confirm('All payment statuses updated to Unpaid!');
+           const response= await axios.put(`${Api}/api/students/updateallpaymentstatus`, { withCredentials: true });
+            console.log(response.data.message);
+            // window.location.reload();
         } catch (error) {
             console.log('Error in updating all payment status:',error);
         }
     };
+    
+
+    if (loading) {
+        return (
+            <div className="loading-container">
+                <div className="loading-spinner"></div>
+                <p className="loading-text">Loading Admin Dashboard...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="admin-dashboard">
@@ -218,7 +241,7 @@ const AdminDashboard = () => {
                                         <td>{student.RoomNumber}</td>
                                         <td>₹{student.AmountPerMonth}</td>
                                         <td>{student.Mobilenumber}</td>
-                                        <td> <button onClick={updatepaymentstatus(student._id)} className='btn-hero-secondary'>Ispaid?</button></td>
+                                        <td> <button onClick={updatepaymentstatus(student)} className='btn-hero-secondary'>Ispaid?</button></td>
                                     </tr>
                                 </tbody>
                             )) :
@@ -295,10 +318,10 @@ const AdminDashboard = () => {
                             <tr>
                                 <th>S.No</th>
                                 <th>Room</th>
-                                <th>Sharing</th>
+                                <th>Name</th>
                                 <th>Start Date</th>
                                 <th>Amount</th>
-                                <th>Name</th>
+                                <th>Sharing</th>
                                 <th>Mobile</th>
                                 <th>College</th>
                                 <th>Actions</th>
@@ -311,15 +334,15 @@ const AdminDashboard = () => {
                                 <tr key={student._id}>
                                     <td>{index + 1}</td>
                                     <td>{student.RoomNumber}</td>
-                                    <td>{student.Sharing}-sharing</td>
+                                    <td>{student.StudentName}</td>
                                     <td>{new Date(student.StartingDate).toISOString().split('T')[0]}</td>
                                     <td>₹{student.AmountPerMonth}</td>
-                                    <td>{student.StudentName}</td>
+                                    <td>{student.Sharing}-Sharing</td>
                                     <td>{student.Mobilenumber}</td>
                                     <td>{student.CollegeName}</td>
                                     <td>
                                         <button className="action-btn edit" onClick={() => handleEdit(student)} title="Edit"><Edit2 size={18} /></button>
-                                        <button className="action-btn delete" onClick={() => handleDelete(student._id)} title="Delete"><Trash2 size={18} /></button>
+                                        <button className="action-btn delete" onClick={() => handleDelete(student)} title="Delete"><Trash2 size={18} /></button>
                                     </td>
                                 </tr>
                             )) : <tr><td colSpan="9" style={{ textAlign: 'center' }}>No students found.</td></tr>}

@@ -5,6 +5,9 @@ import userRoutes from './routes/StudentRoutes.js';
 import cors from 'cors';
 import session from 'express-session';
 
+// Load environment variables first
+dotenv.config();
+
 const app = express();
 
 const allowedOrigins = [
@@ -42,10 +45,8 @@ app.use(
   })
 );
 
-
 const port = process.env.SRINIDHI_PORT || 5000;
-connectDB();
-dotenv.config();
+connectDB(process.env.MONGO_URI);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

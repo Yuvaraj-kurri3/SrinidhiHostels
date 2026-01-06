@@ -1,14 +1,10 @@
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-dotenv.config({ path: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../.env') });
+ 
 
-
-async function connectDB() {
+async function connectDB(MONGO_URI) {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(MONGO_URI);
     console.log('MongoDB connected successfully✅');
  } catch (error) {
     console.error('MongoDB connection error❌:', error);

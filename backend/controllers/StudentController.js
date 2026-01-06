@@ -79,7 +79,7 @@ export const getAllStudents = async (req, res) => {
         res.status(200).json({ message: 'Students fetched successfully', data: students });
     }
     catch (error) {
-        // console.log('Error in fetching students:', error);
+        console.log('Error in fetching students:', error);
         res.status(500).json({ message: 'Something went wrong', error: error.message });
     }
 }
@@ -139,6 +139,9 @@ export const Getbyroomnumber=async(req,res)=>{
  export const unpaidlist  = async(req,res)=>{
     try {
         const unpaidlist= await Allstudents.find({paymentstatus:"Unpaid"});
+        if(unpaidlist.length==0){
+            return res.status(404).json({message:"No unpaid students found"});
+        }
         return res.status(200).json({message:"List found",data:unpaidlist});
     } catch (error) {
         return res.status(404).json({message:"not found"})

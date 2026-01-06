@@ -98,10 +98,11 @@ const StudentDashboard = () => {
         role: user?.role || "Loading..."
     };
 
-    if (loading) {
+ if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
-                <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="loading-container">
+                <div className="loading-spinner"></div>
+                <p className="loading-text">Loading Student Dashboard...</p>
             </div>
         );
     }
