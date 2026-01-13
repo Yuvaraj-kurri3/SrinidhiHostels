@@ -1,11 +1,12 @@
 import React, { useState, useEffect, use } from 'react';
-import { Menu, LogOut, Edit2, Trash2, UserPlus, Search } from 'lucide-react';
+import { Menu, LogOut, Edit2, Trash2, UserPlus, Search, ChevronsUp } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './AdminDashboard.css';
 import Navbar from '../components/Navbar';
 import AddStudent from '../components/AddStudent';
-import api from '../api.js';
+import FeeStatus from './FeeStatus.jsx';
+ import api from '../api.js';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -21,6 +22,10 @@ const AdminDashboard = () => {
     const [unpaidlist, setUnpaidlist] = useState([]);
     const [loading, setLoading] = useState(true);
     const [updated,SetUpdated]=useState(false);
+    const [paymentdate,setPaymentdate]=useState('');
+    const [dateupdatig,setDateupdatig]=useState(false);
+    const [updationstudent,setUpdationstudent]=useState([])
+
     const Api = api;
 
     useEffect(() => {
@@ -146,22 +151,33 @@ const AdminDashboard = () => {
         fetchunpaidlist();
     }, []);
 
-    const updatepaymentstatus = (student) => async () => {
+    const updatepaymentstatus = (student, paymentDate) =>  () => {
 
-        try {
-            await axios.put(`${Api}/api/students/updatepaymentstatus/${student._id}`, { withCredentials: true });
-            // Refresh unpaid list
-            const response = await axios.get(`${Api}/api/students/unpaidlist`, { withCredentials: true });
-            if (response.status === 200) {
-                setUnpaidlist(response.data.data);
-            }
-            confirm(`Payment status for ${student.StudentName} updated to Paid!`);
+        try {       
+              setDateupdatig(false);
+        setTimeout(async ()=>{
+                const res=confirm(`Payment status for ${student.StudentName} updated to Paid!`);
+            if(res===true){
+                    
 
-            window.location.reload();
+                     await axios.put(`${Api}/api/students/updatepaymentstatus/${student._id}`, { paymentDate: paymentDate }, { withCredentials: true });
+                     // Refresh unpaid list
+                  const response = await axios.get(`${Api}/api/students/unpaidlist`, { withCredentials: true });
+                      if (response.status === 200) {
+                    setUnpaidlist(response.data.data);
+                         }
+                         setDateupdatig(false)
+                         window.location.reload();
+                 }
+        },200)
+            
+      
+
         } catch (error) {
             console.error('Error updating payment status:', error);
             confirm('Failed to update payment status.');
         }
+        
 
     }
 
@@ -178,7 +194,19 @@ const AdminDashboard = () => {
             console.log('Error in updating all payment status:',error);
         }
     };
-    
+        const handledateupdation = (student) => {
+        return () => {
+            setDateupdatig(true);
+            setPaymentdate('');
+            setUpdationstudent({...student});
+        };
+    };
+    const handlepaymentdate = (e)=>{
+        console.log('direct:',e.target.value);
+        setPaymentdate(e.target.value);
+        updatepaymentstatus(updationstudent, e.target.value)();
+      
+    };
 
     if (loading) {
         return (
@@ -213,7 +241,10 @@ const AdminDashboard = () => {
                             <span className="stat-label">Rooms Occupied</span>
                         </div>
                         <button className="update-payment-btn" onClick={updateallpaymentstatus}>Update Payment Status</button>
+                        <Link to={'/student-fee-status'}><button className="update-payment-btn">Students Payments Histroy</button>
+</Link>
                     </div>
+
                 </div>
             </header>
             {updated &&      <h2 className="section-payment md:text-center">Payment Status Updated!</h2>    }
@@ -244,7 +275,7 @@ const AdminDashboard = () => {
                                         <td>{student.RoomNumber}</td>
                                         <td>₹{student.AmountPerMonth}</td>
                                         <td>{student.Mobilenumber}</td>
-                                        <td> <button onClick={updatepaymentstatus(student)} className='btn-hero-secondary'>Ispaid?</button></td>
+                                        <td> <button onClick={() => handledateupdation(student)()} className='btn-hero-secondary'>Ispaid?</button></td>
                                     </tr>
                                 </tbody>
                             )) :
@@ -476,6 +507,25 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             )}
+           {
+            dateupdatig && (
+                      <div className="date-box">
+                      <div className="date-content">
+                        <div className="modal-header">
+                            <h3>Select Payment Date</h3>
+                         </div>
+                         <input type="date" 
+                         name='date'
+                         id='date'
+                         value={paymentdate}
+                         onChange={e => handlepaymentdate(e)}
+                         />
+                    <button onClick={ ()=> setDateupdatig(false)}>close</button>
+                    </div>
+                </div>
+            )
+           }
+
         </div>
     );
 };

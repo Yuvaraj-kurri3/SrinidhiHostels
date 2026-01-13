@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const allstudents=new mongoose.Schema({
+const Studentsdetails=new mongoose.Schema({
     RoomNumber:{
         type:String,
         required:true,
@@ -44,16 +44,15 @@ const allstudents=new mongoose.Schema({
     CourseNameandYear:{
         type:String,
         required:true,
-    },
-    paymentstatus:{
-        type:String,
-        required:true,
-    },
+    },  
     isActive:{
         type:Boolean,
         default:true
-    } 
-    
-})
+    },
+    paymentstatus:{
+        type:String,
+        required:true
+    }
+});
 
-export default mongoose.model('Allstudents',allstudents);
+export default mongoose.model('StudentsDetails',Studentsdetails);

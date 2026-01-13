@@ -1,4 +1,4 @@
-import allstudents from "../models/Allstudents.js";
+import Studentsdetails from "../models/StudentsDetails.js";
 import dotenv from "dotenv";
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -10,11 +10,11 @@ export const AddNewStudents=async(req,res)=>{
 
     const{RoomNumber,Sharing,StartingDate,AmountPerMonth,StudentName,Mobilenumber,PMobilenumber,Email,Address,CollegeName,CourseNameandYear,paymentstatus}=req.body;
      try {
-        const isalreadyindb= await allstudents.findOne({Email:Email});
+        const isalreadyindb= await Studentsdetails.findOne({Email:Email});
         if(isalreadyindb){
             return res.status(400).json({message:'Student already exists'});
         }
-        const newstudent=new allstudents({
+        const newstudent=new Studentsdetails({
             RoomNumber,
             Sharing,
             StartingDate:new Date(StartingDate),
@@ -26,7 +26,7 @@ export const AddNewStudents=async(req,res)=>{
             CollegeName,
             CourseNameandYear,
             PMobilenumber,
-            paymentstatus
+            paymentstatus,
         });
 
         await newstudent.save();
@@ -47,9 +47,9 @@ export const UpdateAllPaymentStatus=async(req,res)=>{
     
         await mongoose.connect(process.env.MONGO_URI);
     
-        const result = await allstudents.updateMany(
-          { isActive: true, paymentstatus: "Paid" },
-          { $set: { paymentstatus: "Unpaid" } }
+        const result = await Studentsdetails.updateMany(
+          { isActive: true },
+          { $set: { paymentHistory: [{ status: "Unpaid", date: new Date() }] } }
         );
     
         console.log(`✅ Updated ${result.modifiedCount} students to Unpaid`);

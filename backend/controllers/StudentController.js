@@ -1,6 +1,6 @@
 import express from 'express';
 import registerSchema from '../models/Student.js';
-import Allstudents from '../models/Allstudents.js';
+import Studentsdetails from '../models/StudentsDetails.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
@@ -75,7 +75,7 @@ export const loginstudent = async (req, res) => {
 
 export const getAllStudents = async (req, res) => {
     try {
-        const students = await Allstudents.find({});
+        const students = await Studentsdetails.find({});
         res.status(200).json({ message: 'Students fetched successfully', data: students });
     }
     catch (error) {
@@ -87,7 +87,7 @@ export const getAllStudents = async (req, res) => {
 export const getStudentbymail = async (req, res) => {
     const { email } = req.params;
     try {
-        const students = await Allstudents.findOne({ Email: email });
+        const students = await Studentsdetails.findOne({ Email: email });
         res.status(200).json({ message: 'Student fetched successfully', data: students });
     }
     catch (error) {
@@ -99,7 +99,7 @@ export const getStudentbymail = async (req, res) => {
 export const deletestudent = async (req, res) => {
     const { id } = req.params;
     try {
-        await Allstudents.findByIdAndDelete(id);
+        await Studentsdetails.findByIdAndDelete(id);
         res.status(200).json({ message: 'Student deleted successfully' });
     } catch (error) {
         // console.log('Error in deleting student:', error);
@@ -111,7 +111,7 @@ export const updatestudent = async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
     try {
-        const updatedStudent = await Allstudents.findByIdAndUpdate(id, updateData, { new: true });
+        const updatedStudent = await Studentsdetails.findByIdAndUpdate(id, updateData, { new: true });
         if (!updatedStudent) {
             return res.status(404).json({ message: 'Student not found' });
         }
@@ -122,44 +122,81 @@ export const updatestudent = async (req, res) => {
     }
 }
 
-export const Getbyroomnumber=async(req,res)=>{
-    const {roomnumber}=req.params;
+export const Getbyroomnumber = async (req, res) => {
+    const { roomnumber } = req.params;
     try {
-        const response= await Allstudents.find({RoomNumber:roomnumber});
-        if(response.length==0){
-            return res.status(404).json({message:'Room not found'});
+        const response = await Studentsdetails.find({ RoomNumber: roomnumber });
+        if (response.length == 0) {
+            return res.status(404).json({ message: 'Room not found' });
         }
-        res.status(200).json({message:'Room found',data:response});
+        res.status(200).json({ message: 'Room found', data: response });
     } catch (error) {
         // console.log('Error in getting room by room number:',error);
-        return res.status(500).json({message:'Something went wrong',error:error.message});
+        return res.status(500).json({ message: 'Something went wrong', error: error.message });
     }
- }
+}
 
- export const unpaidlist  = async(req,res)=>{
+export const unpaidlist = async (req, res) => {
     try {
-        const unpaidlist= await Allstudents.find({paymentstatus:"Unpaid"});
-        if(unpaidlist.length==0){
-            return res.status(404).json({message:"No unpaid students found"});
+        const unpaidlist = await Studentsdetails.find({paymentstatus:"Unpaid"});
+         if (unpaidlist.length == 0) {
+            return res.status(404).json({ message: "No unpaid students found" });
         }
-        return res.status(200).json({message:"List found",data:unpaidlist});
+        return res.status(200).json({ message: "List found", data: unpaidlist });
     } catch (error) {
-        return res.status(404).json({message:"not found"})
+        console.log('Error in fetching unpaid list:', error);
+        return res.status(404).json({ message: "not found" })
     }
- }
+}
 
- export const UpdatePaymentStatus= async(req,res)=>{
-    const {id}=req.params;
+export const UpdatePaymentStatus = async (req, res) => {
+    const { paymentDate } = req.body;
+    const { id } = req.params;
     try {
         // console.log('Updating payment status for student ID:',id);
-        const student= await Allstudents.findById(id);
-        if(!student){
-            return res.status(404).json({message:'Student not found'});
+        const student = await Studentsdetails.findById(id);
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found' });
         }
         student.paymentstatus="Paid";
         await student.save();
-        return res.status(200).json({message:'Payment status updated to Paid',data:student});
+        return res.status(200).json({ message: 'Payment status updated to Paid', data: student });
     } catch (error) {
-        return res.status(500).json({message:'Error while updating payment status',error:error.message});
+        console.log('Error in updating payment status:', error);
+        return res.status(500).json({ message: 'Error while updating payment status', error: error.message });
     }
- }
+}
+
+// export const getLatestPaymentStatus = async (req, res) => {
+//     try {
+//         const students = await Studentsdetails.find({});
+//         const studentPaymentStatus = students.map(student => {
+//             if (student.paymentHistory && student.paymentHistory.length > 0) {
+//                 // Assuming the last element is the latest, but sorting is safer
+//                 const latestPayment = student.paymentHistory.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+//                 return {
+//                     StudentName: student.StudentName,
+//                     RoomNumber: student.RoomNumber,
+//                     latestPaymentStatus: latestPayment.status,
+//                     latestPaymentDate: latestPayment.date,
+//                     StudentMobileNumber: student.StudentMobileNumber,
+//                     StudentEmail: student.StudentEmail
+//                 };
+//             } else {
+//                 return {
+//                     StudentName: student.StudentName,
+//                     RoomNumber: student.RoomNumber,
+//                     latestPaymentStatus: 'No Payment Record',
+//                     latestPaymentDate: null,
+//                     StudentMobileNumber: student.StudentMobileNumber,
+//                     StudentEmail: student.StudentEmail
+//                 };
+//             }
+//         });
+//         res.status(200).json({ message: 'Latest payment status fetched successfully', data: studentPaymentStatus });
+//     } catch (error) {
+//         console.log('Error in fetching latest payment status:', error);
+//         res.status(500).json({ message: 'Something went wrong', error: error.message });
+//     }
+// }
+
