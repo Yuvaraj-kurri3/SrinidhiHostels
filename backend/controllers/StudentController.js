@@ -1,6 +1,7 @@
 import express from 'express';
 import registerSchema from '../models/Student.js';
 import Studentsdetails from '../models/StudentsDetails.js';
+import paymentHistory from '../models/PaymentHistroy.js'
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
@@ -150,7 +151,7 @@ export const unpaidlist = async (req, res) => {
 }
 
 export const UpdatePaymentStatus = async (req, res) => {
-    const { paymentDate } = req.body;
+    const { paymentDate} = req.body;
     const { id } = req.params;
     try {
         // console.log('Updating payment status for student ID:',id);
@@ -158,9 +159,26 @@ export const UpdatePaymentStatus = async (req, res) => {
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
-        student.paymentstatus="Paid";
+
+        // Create new payment history record
+        const newPaymentRecord = new paymentHistory({
+            studentid: id,
+            payments: [{
+                status:  "Paid",
+                date: new Date(paymentDate) || new Date()
+            }]
+        });
+        
+        await newPaymentRecord.save();
+        
+        student.paymentstatus = "Paid";
         await student.save();
-        return res.status(200).json({ message: 'Payment status updated to Paid', data: student });
+        
+        return res.status(200).json({ 
+            message: 'Payment status updated to Paid', 
+            data: student,
+            paymentHistory: newPaymentRecord
+        });
     } catch (error) {
         console.log('Error in updating payment status:', error);
         return res.status(500).json({ message: 'Error while updating payment status', error: error.message });

@@ -17,4 +17,5 @@ router.get('/unpaidlist', user.unpaidlist);
 router.put('/updatepaymentstatus/:id', user.UpdatePaymentStatus);
 // router.get('/latestpaymentstatus', user.getLatestPaymentStatus);
 router.put('/updateallpaymentstatus', student.UpdateAllPaymentStatus);
+ 
 export default router;

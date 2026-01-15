@@ -158,8 +158,6 @@ const AdminDashboard = () => {
         setTimeout(async ()=>{
                 const res=confirm(`Payment status for ${student.StudentName} updated to Paid!`);
             if(res===true){
-                    
-
                      await axios.put(`${Api}/api/students/updatepaymentstatus/${student._id}`, { paymentDate: paymentDate }, { withCredentials: true });
                      // Refresh unpaid list
                   const response = await axios.get(`${Api}/api/students/unpaidlist`, { withCredentials: true });
@@ -169,10 +167,7 @@ const AdminDashboard = () => {
                          setDateupdatig(false)
                          window.location.reload();
                  }
-        },200)
-            
-      
-
+        },200);
         } catch (error) {
             console.error('Error updating payment status:', error);
             confirm('Failed to update payment status.');
