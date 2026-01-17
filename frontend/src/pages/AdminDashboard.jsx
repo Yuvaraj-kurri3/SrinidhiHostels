@@ -24,7 +24,9 @@ const AdminDashboard = () => {
     const [updated,SetUpdated]=useState(false);
     const [paymentdate,setPaymentdate]=useState('');
     const [dateupdatig,setDateupdatig]=useState(false);
-    const [updationstudent,setUpdationstudent]=useState([])
+    const [updationstudent,setUpdationstudent]=useState([]);
+    const [displayCount, setDisplayCount] = useState(5);
+    const[settrue,setTrue]=useState(true);
 
     const Api = api;
 
@@ -202,7 +204,14 @@ const AdminDashboard = () => {
         updatepaymentstatus(updationstudent, e.target.value)();
       
     };
-
+    const showmore = ()=>{
+        setDisplayCount(displayCount+5);
+        setTrue(false);
+    }
+     const showless = ()=>{
+        setDisplayCount(5);
+        setTrue(true);
+    }
     if (loading) {
         return (
             <div className="loading-container">
@@ -359,7 +368,7 @@ const AdminDashboard = () => {
 
                         <tbody>
 
-                            {students.length != 0 ? students.map((student, index) => (
+                            {students.length != 0 ? students.slice(0, displayCount).map((student, index) => (
                                 <tr key={student._id}>
                                     <td>{index + 1}</td>
                                     <td>{student.RoomNumber}</td>
@@ -378,6 +387,38 @@ const AdminDashboard = () => {
                         </tbody>
                     </table>
                 </div>
+            {
+                settrue ? (
+                        students.length > 5 && displayCount < students.length && (
+                    <div style={{ textAlign: 'center', marginTop: '1.2rem' }}>
+                        <button 
+                            onClick={() => showmore()}
+                            className="btn-hero-secondary"
+                            style={{ padding: '0.75rem 1.5rem', fontSize: '0.95rem' }}
+                        >
+                            Show More ({displayCount} of {students.length-1})
+                        </button>
+                    </div>
+                ) 
+                )  :      !settrue && (
+                              
+                    <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+                        <button 
+                            onClick={() => showless()}
+                            className="btn-hero-secondary"
+                            style={{ padding: '0.75rem 1.5rem', fontSize: '0.95rem' }}
+                        >
+                            Show Less  
+                        </button>
+                    </div>
+                )
+                    
+            }
+
+            {/* show less */}
+                {
+               
+                }
             </section>
 
             {/* Footer */}
@@ -502,6 +543,7 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             )}
+            {/* date pop up */}
            {
             dateupdatig && (
                       <div className="date-box">

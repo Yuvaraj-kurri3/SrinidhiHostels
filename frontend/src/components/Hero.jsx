@@ -19,7 +19,7 @@ const Hero = () => {
                         <Link to="/student-dashboard"><button className="btn-hero-primary">
                             Student <ArrowRight size={20} />
                         </button></Link>
-                        <Link to="/admin-dashboard"><button className="btn-hero-primary">Admin</button></Link>
+                        <Link to="/admin-dashboard"><button className="btn-hero-primary">Admin <ArrowRight size={20} /></button></Link>
                     </div>
                 </div>
 

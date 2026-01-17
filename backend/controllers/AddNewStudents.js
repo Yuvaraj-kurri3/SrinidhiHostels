@@ -31,12 +31,10 @@ export const AddNewStudents=async(req,res)=>{
 
         await newstudent.save();
         res.status(201).json({message:'New Student Added Successfully',data:newstudent});
- 
         
-
     } catch (error) {
         console.log('Error in adding new student:',error);
-        return res.status(500).json({message:'Something went wrong:30',error:error.message});
+        return res.status(500).json({message:'Something went wrong! please try again later',error:error.message});
     }
     
 }

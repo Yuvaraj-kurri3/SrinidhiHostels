@@ -7,7 +7,7 @@ import api from '../api.js'
  const initial = {
   StudentName: '',
   RoomNumber: '',
-  Sharing: '1-sharing',
+  Sharing: '',
   CollegeName: '',
   CourseNameandYear: '',
   Mobilenumber: '',
@@ -30,6 +30,7 @@ export default function AddStudent() {
  
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(name,value);
     setForm((s) => {
       const updated = { ...s, [name]: value };
       
@@ -70,6 +71,9 @@ export default function AddStudent() {
             if(parsedUser.email !== form.Email){
               alert("Please use your logged-in email address to add student");
               return;
+            }
+            if(form.Sharing===''){
+              return alert('select room type')
             }
 
       try {
@@ -151,7 +155,9 @@ export default function AddStudent() {
             value={form.Sharing} 
             onChange={handleChange}
             className="form-select"
+            placeholder="select Room type"
           >
+               <option value={''} >Select Room Type</option>
             <option value={'1'} >1-sharing</option>
             <option value={'2'}>2-sharing</option>
             <option value={'3'}>3-sharing</option>
@@ -168,7 +174,7 @@ export default function AddStudent() {
             value={form.StartingDate} 
             onChange={handleChange}
             className="form-input"
-            placeholder="Optional second contact" 
+            placeholder="Joining Date" 
           />
         </label>
 
@@ -257,7 +263,7 @@ export default function AddStudent() {
             onChange={handleChange}
             className="form-input"
             placeholder="ex:7000" 
-            readOnly
+           readOnly
           />
         </label>
          <label className="form-group">
