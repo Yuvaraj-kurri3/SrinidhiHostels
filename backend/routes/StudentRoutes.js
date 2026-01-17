@@ -1,6 +1,7 @@
 import express from 'express';
 import * as user from '../controllers/StudentController.js';
 import * as  student from '../controllers/AddNewStudents.js';
+import * as history from '../controllers/PaymentHistroyController.js';
 
 
 const router = express.Router();
@@ -17,5 +18,6 @@ router.get('/unpaidlist', user.unpaidlist);
 router.put('/updatepaymentstatus/:id', user.UpdatePaymentStatus);
 // router.get('/latestpaymentstatus', user.getLatestPaymentStatus);
 router.put('/updateallpaymentstatus', student.UpdateAllPaymentStatus);
+router.get('/paymenthistroy', history.studentspaymenthistroy);
  
 export default router;

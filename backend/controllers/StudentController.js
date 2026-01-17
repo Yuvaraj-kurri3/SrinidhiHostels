@@ -71,9 +71,6 @@ export const loginstudent = async (req, res) => {
     }
 }
 
-
-
-
 export const getAllStudents = async (req, res) => {
     try {
         const students = await Studentsdetails.find({});
@@ -163,6 +160,8 @@ export const UpdatePaymentStatus = async (req, res) => {
         // Create new payment history record
         const newPaymentRecord = new paymentHistory({
             studentid: id,
+            studentname:student.StudentName,
+            roomnumber:student.RoomNumber,
             payments: [{
                 status:  "Paid",
                 date: new Date(paymentDate) || new Date()
@@ -184,37 +183,3 @@ export const UpdatePaymentStatus = async (req, res) => {
         return res.status(500).json({ message: 'Error while updating payment status', error: error.message });
     }
 }
-
-// export const getLatestPaymentStatus = async (req, res) => {
-//     try {
-//         const students = await Studentsdetails.find({});
-//         const studentPaymentStatus = students.map(student => {
-//             if (student.paymentHistory && student.paymentHistory.length > 0) {
-//                 // Assuming the last element is the latest, but sorting is safer
-//                 const latestPayment = student.paymentHistory.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
-//                 return {
-//                     StudentName: student.StudentName,
-//                     RoomNumber: student.RoomNumber,
-//                     latestPaymentStatus: latestPayment.status,
-//                     latestPaymentDate: latestPayment.date,
-//                     StudentMobileNumber: student.StudentMobileNumber,
-//                     StudentEmail: student.StudentEmail
-//                 };
-//             } else {
-//                 return {
-//                     StudentName: student.StudentName,
-//                     RoomNumber: student.RoomNumber,
-//                     latestPaymentStatus: 'No Payment Record',
-//                     latestPaymentDate: null,
-//                     StudentMobileNumber: student.StudentMobileNumber,
-//                     StudentEmail: student.StudentEmail
-//                 };
-//             }
-//         });
-//         res.status(200).json({ message: 'Latest payment status fetched successfully', data: studentPaymentStatus });
-//     } catch (error) {
-//         console.log('Error in fetching latest payment status:', error);
-//         res.status(500).json({ message: 'Something went wrong', error: error.message });
-//     }
-// }
-

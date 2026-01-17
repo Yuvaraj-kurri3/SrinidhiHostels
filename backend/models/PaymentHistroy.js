@@ -1,11 +1,18 @@
 import mongoose  from "mongoose";
 
-const paymentHistory= new mongoose.Schema({
+const studentpaymentHistory= new mongoose.Schema({
     studentid:{
         type:String,
         required:true
     },
-    
+    studentname:{
+        type:String,
+        required:true
+    },
+    roomnumber:{
+        type:String,
+        required:true
+    },
     payments:[{
         status:{
             type:String,
@@ -19,4 +26,4 @@ const paymentHistory= new mongoose.Schema({
     }]
 })
 
-export default mongoose.model("PaymentHistroy",paymentHistory);
+export default mongoose.model("PaymentHistroy",studentpaymentHistory);

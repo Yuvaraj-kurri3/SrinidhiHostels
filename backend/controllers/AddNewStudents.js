@@ -47,9 +47,9 @@ export const UpdateAllPaymentStatus=async(req,res)=>{
     
         const result = await Studentsdetails.updateMany(
           { isActive: true },
-          { $set: { paymentHistory: [{ status: "Unpaid", date: new Date() }] } }
+          { $set: { paymentstatus: "Unpaid"} }
         );
-    
+        
         console.log(`✅ Updated ${result.modifiedCount} students to Unpaid`);
         res.status(200).json({ message: 'All active students payment status updated to Unpaid' });
     
